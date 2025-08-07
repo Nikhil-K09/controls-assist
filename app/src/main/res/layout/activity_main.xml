@@ -172,20 +172,12 @@
                         android:gravity="center_vertical"
                         android:paddingVertical="4dp">
 
-                        <SeekBar
-                            android:id="@+id/seek_brightness"
-                            android:layout_width="0dp"
-                            android:layout_weight="1"
-                            android:layout_height="wrap_content"
-                            android:max="255"
-                            android:paddingEnd="8dp" />
-
                         <ToggleButton
                             android:id="@+id/toggle_brightness"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textOff="Unlock"
-                            android:textOn="Lock" />
+                            android:textOff="Lock Current Level"
+                            android:textOn="Disable" />
                     </LinearLayout>
                 </LinearLayout>
 

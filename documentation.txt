@@ -1,0 +1,29 @@
+
+permissions
+-shared preferences
+-background service
+-permanent notification
+-calls permission 
+-sound permission
+-allow in background permission
+-auto startup
+
+
+Sound lock
+-toggle multiple streams(like ringtone, music, alarm)
+-description : first there should be seekbar to adjust the volume and we should lock the selected sound streams to this volume percentage. Whenever the volume buttons are pressed it should automatically to this volume which we set in app (it can be done by either simultaneously increasing/decreasing volume till requirement is met)
+
+
+Brightness lock
+-same as sound lock a seek bar and brightness lock
+
+
+Flashlight toggle:
+- just a toggle button for flickering flashlight when incoming call
+
+
+Permanent notification which shows that the control assist is running
+
+
+Dark Mode toggle:
+- Bottom right a floating button to switch between light and night themes

@@ -24,16 +24,15 @@ class MainActivity : AppCompatActivity() {
     private val handler = Handler(Looper.getMainLooper())
     private val streamData = mutableMapOf<Int, StreamControl>()
     private val enforcementRunnables = mutableMapOf<Int, Runnable>()
-
-    private var brightnessTarget = 128
-    private var brightnessLocked = false
+    private lateinit var brightnessControl: BrightnessControl
     private var brightnessRunnable: Runnable? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         sharedPref = getSharedPreferences("ControlPrefs", MODE_PRIVATE)
         val isDarkMode = sharedPref.getBoolean("dark_mode", false)
         AppCompatDelegate.setDefaultNightMode(
-            if (isDarkMode) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
+            if (isDarkMode) AppCompatDelegate.MODE_NIGHT_YES
+            else AppCompatDelegate.MODE_NIGHT_NO
         )
 
         super.onCreate(savedInstanceState)
@@ -46,8 +45,7 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        val serviceIntent = Intent(this, ControlService::class.java)
-        startForegroundService(serviceIntent)
+        startForegroundService(Intent(this, ControlService::class.java))
 
         audioManager = getSystemService(AUDIO_SERVICE) as AudioManager
 
@@ -81,7 +79,6 @@ class MainActivity : AppCompatActivity() {
     private fun toggleTheme() {
         val isDarkMode = sharedPref.getBoolean("dark_mode", false)
         sharedPref.edit().putBoolean("dark_mode", !isDarkMode).apply()
-
         AppCompatDelegate.setDefaultNightMode(
             if (!isDarkMode)
                 AppCompatDelegate.MODE_NIGHT_YES
@@ -128,7 +125,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun enforceVolume(streamType: Int) {
         val control = streamData[streamType] ?: return
-
         val runnable = object : Runnable {
             override fun run() {
                 val currentVolume = audioManager.getStreamVolume(streamType)
@@ -140,39 +136,21 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-
         enforcementRunnables[streamType] = runnable
         handler.post(runnable)
     }
 
     private fun setupBrightnessControl() {
-        binding.seekBrightness.max = 100
-
-        // Get current brightness
-        try {
-            val current = Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS)
-            brightnessTarget = current
-            binding.seekBrightness.progress = (current * 100) / 255
-        } catch (e: Settings.SettingNotFoundException) {
-            e.printStackTrace()
-        }
-
-        binding.seekBrightness.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(sb: SeekBar?, progress: Int, fromUser: Boolean) {
-                if (fromUser) {
-                    val brightness = (progress * 255) / 100
-                    setSystemBrightness(brightness)
-                    brightnessTarget = brightness
-                }
-            }
-
-            override fun onStartTrackingTouch(sb: SeekBar?) {}
-            override fun onStopTrackingTouch(sb: SeekBar?) {}
-        })
+        val currentBrightness = Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, 125)
+        brightnessControl = BrightnessControl(currentBrightness, false)
 
         binding.toggleBrightness.setOnCheckedChangeListener { _, isChecked ->
-            brightnessLocked = isChecked
+            brightnessControl.locked = isChecked
             if (isChecked) {
+                // Lock the currently set brightness
+                brightnessControl.targetBrightness = Settings.System.getInt(
+                    contentResolver, Settings.System.SCREEN_BRIGHTNESS, 125
+                )
                 enforceBrightness()
             } else {
                 brightnessRunnable?.let { handler.removeCallbacks(it) }
@@ -180,31 +158,40 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun setSystemBrightness(value: Int) {
-        Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, value)
-        val lp = window.attributes
-        lp.screenBrightness = value / 255f
-        window.attributes = lp
-    }
 
     private fun enforceBrightness() {
         brightnessRunnable = object : Runnable {
             override fun run() {
-                try {
-                    val current = Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS)
-                    if (current != brightnessTarget && brightnessLocked) {
-                        setSystemBrightness(brightnessTarget)
-                    }
-                } catch (e: Settings.SettingNotFoundException) {
-                    e.printStackTrace()
-                }
+                if (brightnessControl.locked && Settings.System.canWrite(this@MainActivity)) {
+                    try {
+                        Settings.System.putInt(
+                            contentResolver,
+                            Settings.System.SCREEN_BRIGHTNESS_MODE,
+                            Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL
+                        )
 
-                if (brightnessLocked) {
+                        val current = Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS)
+                        val target = brightnessControl.targetBrightness.coerceIn(0, 255)
+
+                        if (current != target) {
+                            Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, target)
+                        }
+
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
                     handler.postDelayed(this, 1000)
                 }
             }
         }
         handler.post(brightnessRunnable!!)
+    }
+
+
+    private fun applyBrightness(brightness: Int) {
+        val layoutParams = window.attributes
+        layoutParams.screenBrightness = brightness / 255f
+        window.attributes = layoutParams
     }
 
     override fun onBackPressed() {
@@ -215,10 +202,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    data class StreamControl(
-        val streamType: Int,
-        val maxVolume: Int,
-        var targetVolume: Int = 0,
-        var locked: Boolean = false
-    )
+    data class StreamControl(val streamType: Int, val maxVolume: Int, var targetVolume: Int = 0, var locked: Boolean = false)
+    data class BrightnessControl(var targetBrightness: Int = 125, var locked: Boolean = false)
 }
