@@ -147,7 +147,6 @@ class MainActivity : AppCompatActivity() {
         binding.toggleBrightness.setOnCheckedChangeListener { _, isChecked ->
             brightnessControl.locked = isChecked
             if (isChecked) {
-                // Lock the currently set brightness
                 brightnessControl.targetBrightness = Settings.System.getInt(
                     contentResolver, Settings.System.SCREEN_BRIGHTNESS, 125
                 )
@@ -157,7 +156,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
 
     private fun enforceBrightness() {
         brightnessRunnable = object : Runnable {
@@ -186,7 +184,6 @@ class MainActivity : AppCompatActivity() {
         }
         handler.post(brightnessRunnable!!)
     }
-
 
     private fun applyBrightness(brightness: Int) {
         val layoutParams = window.attributes

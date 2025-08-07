@@ -21,7 +21,7 @@ class ControlService : Service() {
     private val targetVolumes = mutableMapOf<Int, Int>()  // Stream type to desired volume
 
     private var brightnessLocked = false
-    private var targetBrightness = 128 // default mid value (0–255)
+    private var lockedBrightness = -1 // -1 means not set
 
     override fun onCreate() {
         super.onCreate()
@@ -48,7 +48,7 @@ class ControlService : Service() {
     private fun startControlMonitor() {
         handler.post(object : Runnable {
             override fun run() {
-                // --- Volume Locking ---
+                // Volume Locking
                 for ((streamType, isLocked) in lockStatus) {
                     if (isLocked) {
                         val current = audioManager.getStreamVolume(streamType)
@@ -69,12 +69,19 @@ class ControlService : Service() {
                     }
                 }
 
-                // --- Brightness Locking ---
-                if (brightnessLocked) {
+                // Brightness Locking
+                if (brightnessLocked && lockedBrightness >= 0) {
                     try {
-                        val currentBrightness = Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS)
-                        if (currentBrightness != targetBrightness) {
-                            Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, targetBrightness)
+                        val currentBrightness = Settings.System.getInt(
+                            contentResolver,
+                            Settings.System.SCREEN_BRIGHTNESS
+                        )
+                        if (currentBrightness != lockedBrightness) {
+                            Settings.System.putInt(
+                                contentResolver,
+                                Settings.System.SCREEN_BRIGHTNESS,
+                                lockedBrightness
+                            )
                         }
                     } catch (e: Exception) {
                         e.printStackTrace()
@@ -91,9 +98,22 @@ class ControlService : Service() {
         lockStatus[streamType] = locked
     }
 
-    fun setBrightnessLock(level: Int, locked: Boolean) {
-        targetBrightness = level.coerceIn(0, 255)
+    fun setBrightnessLock(locked: Boolean) {
         brightnessLocked = locked
+        if (locked) {
+            try {
+                // Capture the current system brightness at the time of locking
+                lockedBrightness = Settings.System.getInt(
+                    contentResolver,
+                    Settings.System.SCREEN_BRIGHTNESS
+                )
+            } catch (e: Exception) {
+                e.printStackTrace()
+                lockedBrightness = -1
+            }
+        } else {
+            lockedBrightness = -1
+        }
     }
 
     private fun createNotificationChannel() {
@@ -113,7 +133,7 @@ class ControlService : Service() {
     private fun buildNotification() = NotificationCompat.Builder(this, "control_service_channel")
         .setContentTitle("Controls Assist")
         .setContentText("Volume and brightness lock active")
-        .setSmallIcon(R.drawable.ic_notifications) // Make sure this exists in res/drawable
+        .setSmallIcon(R.drawable.ic_notifications)
         .setOngoing(true)
         .build()
 }
