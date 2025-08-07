@@ -1,52 +1,119 @@
 package com.example.controlsassist
 
-import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
+import android.content.Context
 import android.content.Intent
-import android.os.Build
-import android.os.IBinder
+import android.media.AudioManager
+import android.os.*
+import android.provider.Settings
 import androidx.core.app.NotificationCompat
+import android.content.SharedPreferences
 
 class ControlService : Service() {
 
-    private val CHANNEL_ID = "control_service_channel"
+    private lateinit var audioManager: AudioManager
+    private lateinit var handler: Handler
+    private lateinit var prefs: SharedPreferences
+
+    private val lockStatus = mutableMapOf<Int, Boolean>() // Stream type to lock status
+    private val targetVolumes = mutableMapOf<Int, Int>()  // Stream type to desired volume
+
+    private var brightnessLocked = false
+    private var targetBrightness = 128 // default mid value (0–255)
 
     override fun onCreate() {
         super.onCreate()
+        audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        handler = Handler(Looper.getMainLooper())
+        prefs = getSharedPreferences("ControlPrefs", MODE_PRIVATE)
+
         createNotificationChannel()
+        startForeground(1, buildNotification())
+        startControlMonitor()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        val notification: Notification = NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("Controls Assist Running")
-            .setContentText("Your background controls are active.")
-            .setSmallIcon(R.drawable.ic_notifications)
-            .setOngoing(true)
-            .build()
-
-        startForeground(1, notification)
-
-        // TODO: Add your background logic here (e.g. call monitor, settings lock, etc.)
-
         return START_STICKY
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        handler.removeCallbacksAndMessages(null)
     }
 
     override fun onBind(intent: Intent?): IBinder? = null
 
+    private fun startControlMonitor() {
+        handler.post(object : Runnable {
+            override fun run() {
+                // --- Volume Locking ---
+                for ((streamType, isLocked) in lockStatus) {
+                    if (isLocked) {
+                        val current = audioManager.getStreamVolume(streamType)
+                        val target = targetVolumes[streamType] ?: continue
+
+                        if (current != target) {
+                            if (streamType == AudioManager.STREAM_RING && target == 0) {
+                                audioManager.ringerMode = AudioManager.RINGER_MODE_NORMAL
+                                audioManager.setStreamVolume(streamType, 1, 0)
+                            } else {
+                                try {
+                                    audioManager.setStreamVolume(streamType, target, 0)
+                                } catch (e: SecurityException) {
+                                    e.printStackTrace()
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // --- Brightness Locking ---
+                if (brightnessLocked) {
+                    try {
+                        val currentBrightness = Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS)
+                        if (currentBrightness != targetBrightness) {
+                            Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, targetBrightness)
+                        }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
+
+                handler.postDelayed(this, 500)
+            }
+        })
+    }
+
+    fun setVolumeLock(streamType: Int, volume: Int, locked: Boolean) {
+        targetVolumes[streamType] = volume
+        lockStatus[streamType] = locked
+    }
+
+    fun setBrightnessLock(level: Int, locked: Boolean) {
+        targetBrightness = level.coerceIn(0, 255)
+        brightnessLocked = locked
+    }
+
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
-                CHANNEL_ID,
-                "Control Assist Service",
+                "control_service_channel",
+                "Control Service",
                 NotificationManager.IMPORTANCE_LOW
             ).apply {
-                description = "Keeps Control Assist running in the background"
+                description = "Shows service running for volume and brightness control"
             }
-
             val manager = getSystemService(NotificationManager::class.java)
-            manager?.createNotificationChannel(channel)
+            manager.createNotificationChannel(channel)
         }
     }
+
+    private fun buildNotification() = NotificationCompat.Builder(this, "control_service_channel")
+        .setContentTitle("Controls Assist")
+        .setContentText("Volume and brightness lock active")
+        .setSmallIcon(R.drawable.ic_notifications) // Make sure this exists in res/drawable
+        .setOngoing(true)
+        .build()
 }
