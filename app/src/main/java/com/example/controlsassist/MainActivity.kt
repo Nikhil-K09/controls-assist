@@ -1,5 +1,6 @@
 package com.example.controlsassist
 
+import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -22,10 +23,14 @@ class MainActivity : AppCompatActivity() {
             else AppCompatDelegate.MODE_NIGHT_NO
         )
 
+
         super.onCreate(savedInstanceState)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        val serviceIntent = Intent(this, ControlService::class.java)
+        startForegroundService(serviceIntent)
+
 
         setupToolbarAndDrawer()
         setupDrawerMenu()
