@@ -15,20 +15,20 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <!-- Top App Bar -->
         <!-- Custom Top Bar -->
         <LinearLayout
             android:id="@+id/topBar"
+            style="@style/TopBarStyle"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:background="?attr/colorPrimary"
             android:paddingHorizontal="12dp">
 
             <!-- Menu Icon -->
             <ImageView
                 android:id="@+id/menuIcon"
+                style="@style/IconStyle"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:src="@drawable/menu_icon"
@@ -38,6 +38,7 @@
             <!-- Title -->
             <ImageView
                 android:id="@+id/topBarTitle"
+                style="@style/TitleImageStyle"
                 android:layout_width="180dp"
                 android:layout_height="match_parent"
                 android:src="@drawable/title_img"
@@ -55,7 +56,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:paddingBottom="80dp"> <!-- leave space for FAB -->
+                android:paddingBottom="80dp">
 
                 <!-- SOUND SECTION -->
                 <LinearLayout
@@ -65,14 +66,15 @@
                     android:padding="8dp">
 
                     <TextView
+                        style="@style/SectionTitleText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Sound Control"
-                        android:textStyle="bold"
-                        android:textSize="18sp" />
+                        android:paddingBottom="5dp"/>
 
                     <!-- Music -->
                     <TextView
+                        style="@style/LabelText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Music" />
@@ -85,20 +87,27 @@
                         android:paddingVertical="4dp">
                         <SeekBar
                             android:id="@+id/seek_music"
+                            style="@style/SeekBarStyle"
                             android:layout_width="0dp"
                             android:layout_weight="1"
                             android:layout_height="wrap_content"
-                            android:paddingEnd="8dp" />
+                            android:paddingEnd="8dp"
+                            android:padding="2dp"/>
                         <ToggleButton
                             android:id="@+id/toggle_music"
+                            style="@style/ToggleButtonStyle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textOn="Locked"
-                            android:textOff="Unlocked" />
+                            android:minWidth="90dp"
+                            android:textOn="Enabled"
+                            android:textOff="Disabled"
+                            android:textAllCaps="false" />
+
                     </LinearLayout>
 
                     <!-- Ringtone -->
                     <TextView
+                        style="@style/LabelText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Ringtone" />
@@ -111,20 +120,26 @@
                         android:paddingVertical="4dp">
                         <SeekBar
                             android:id="@+id/seek_ringtone"
+                            style="@style/SeekBarStyle"
                             android:layout_width="0dp"
                             android:layout_weight="1"
                             android:layout_height="wrap_content"
                             android:paddingEnd="8dp" />
                         <ToggleButton
                             android:id="@+id/toggle_ringtone"
+                            style="@style/ToggleButtonStyle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textOn="Locked"
-                            android:textOff="Unlocked" />
+                            android:minWidth="90dp"
+                            android:textOn="Enabled"
+                            android:textOff="Disabled"
+                            android:textAllCaps="false" />
+
                     </LinearLayout>
 
                     <!-- Call -->
                     <TextView
+                        style="@style/LabelText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Call" />
@@ -137,20 +152,26 @@
                         android:paddingVertical="4dp">
                         <SeekBar
                             android:id="@+id/seek_call"
+                            style="@style/SeekBarStyle"
                             android:layout_width="0dp"
                             android:layout_weight="1"
                             android:layout_height="wrap_content"
                             android:paddingEnd="8dp" />
                         <ToggleButton
                             android:id="@+id/toggle_call"
+                            style="@style/ToggleButtonStyle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textOn="Locked"
-                            android:textOff="Unlocked" />
+                            android:minWidth="90dp"
+                            android:textOn="Enabled"
+                            android:textOff="Disabled"
+                            android:textAllCaps="false" />
+
                     </LinearLayout>
 
                     <!-- Alarm -->
                     <TextView
+                        style="@style/LabelText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Alarm" />
@@ -163,21 +184,25 @@
                         android:paddingVertical="4dp">
                         <SeekBar
                             android:id="@+id/seek_alarm"
+                            style="@style/SeekBarStyle"
                             android:layout_width="0dp"
                             android:layout_weight="1"
                             android:layout_height="wrap_content"
                             android:paddingEnd="8dp" />
                         <ToggleButton
                             android:id="@+id/toggle_alarm"
+                            style="@style/ToggleButtonStyle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textOn="Locked"
-                            android:textOff="Unlocked" />
+                            android:minWidth="90dp"
+                            android:textOn="Enabled"
+                            android:textOff="Disabled"
+                            android:textAllCaps="false" />
+
                     </LinearLayout>
                 </LinearLayout>
 
-
-                    <!-- BRIGHTNESS SECTION -->
+                <!-- BRIGHTNESS SECTION -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -185,11 +210,11 @@
                     android:padding="8dp">
 
                     <TextView
+                        style="@style/SectionTitleText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Brightness Control"
-                        android:textStyle="bold"
-                        android:textSize="18sp" />
+                        android:paddingBottom="5dp"/>
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -200,10 +225,14 @@
 
                         <ToggleButton
                             android:id="@+id/toggle_brightness"
+                            style="@style/ToggleButtonStyle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textOff="Lock Current Level"
-                            android:textOn="Disable" />
+                            android:minWidth="90dp"
+                            android:textOn="Enabled"
+                            android:textOff="Disabled"
+                            android:textAllCaps="false" />
+
                     </LinearLayout>
                 </LinearLayout>
 
@@ -214,14 +243,11 @@
     <!-- Navigation Drawer -->
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/navigationView"
+        style="@style/NavigationViewStyle"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:background="@color/black"
         app:menu="@menu/drawer_menu"
-        app:headerLayout="@layout/nav_header"
-        app:itemIconTint="@color/white"
-        app:itemTextColor="@color/white" />
-
+        app:headerLayout="@layout/nav_header" />
 
 </androidx.drawerlayout.widget.DrawerLayout>

@@ -1,5 +1,21 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <!-- Common colors -->
+    <color name="black">#040404</color>
+    <color name="white">#F8F8F8</color>
+    <color name="dark">#3C3C3C</color>
+    <color name="light">#D7D4D4</color>
+    <color name="light_green">#69C33C</color>
+    <color name="grey">#7C7A7A</color>
+    <color name="topbar_light">#EBEBEB</color>
+    <color name="topbar_dark">#212020</color>
+
+    <!-- Light theme palette -->
+    <color name="colorPrimaryLight">#6200EE</color>
+    <color name="colorPrimaryVariantLight">#3700B3</color>
+    <color name="colorSurfaceLight">#FFFFFFFF</color>
+
+    <!-- Dark theme palette -->
+    <color name="colorPrimaryDark">#BB86FC</color>
+    <color name="colorPrimaryVariantDark">#3700B3</color>
+    <color name="colorSurfaceDark">#FF121212</color>
 </resources>

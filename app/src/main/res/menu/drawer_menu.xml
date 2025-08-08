@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/nav_settings"
-        android:title="Settings"
+        android:id="@+id/nav_permissions"
+        android:title="Permissions"
+        style="@style/SectionTitleText"
         android:icon="@drawable/settings_icon" />
     <item
         android:id="@+id/nav_toggle_dark_mode"
         android:title="Dark Mode"
+        style="@style/SectionTitleText"
         android:icon="@drawable/dark_mode_icon" />
 </menu>

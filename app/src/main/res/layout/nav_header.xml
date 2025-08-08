@@ -5,7 +5,7 @@
     android:orientation="horizontal"
     android:gravity="center_vertical"
     android:padding="16dp"
-    android:background="?attr/colorPrimary">
+    style="@style/TopBarStyle">
 
     <!-- App Icon -->
     <ImageView
@@ -21,7 +21,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Controls Assist"
-        android:textColor="@android:color/white"
+        style="@style/SectionTitleText"
         android:textSize="20sp"
         android:layout_marginStart="12dp" />
 </LinearLayout>

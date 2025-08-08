@@ -1,3 +1,27 @@
 <resources>
+    <!-- App Name -->
     <string name="app_name">Controls Assist</string>
+
+    <!-- Volume Section -->
+    <string name="music">Music</string>
+    <string name="ring">Ring</string>
+    <string name="alarm">Alarm</string>
+    <string name="notification">Notification</string>
+    <string name="system">System</string>
+    <string name="call">Call</string>
+
+    <!-- Lock States -->
+    <string name="locked">Locked</string>
+    <string name="unlocked">Unlocked</string>
+
+    <!-- Brightness Section -->
+    <string name="brightness">Brightness</string>
+    <string name="brightness_25">25%</string>
+    <string name="brightness_50">50%</string>
+    <string name="brightness_75">75%</string>
+    <string name="brightness_100">100%</string>
+
+    <!-- Service Notification -->
+    <string name="service_title">Controls Assist</string>
+    <string name="service_text">Volume and brightness lock active</string>
 </resources>
