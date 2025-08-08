@@ -32,6 +32,11 @@ class ControlService : Service() {
         createNotificationChannel()
         startForeground(1, buildNotification())
         startControlMonitor()
+
+        // Initialize Call stream lock status so it's recognized by monitor loop
+        lockStatus[AudioManager.STREAM_VOICE_CALL] = false
+        targetVolumes[AudioManager.STREAM_VOICE_CALL] =
+            audioManager.getStreamVolume(AudioManager.STREAM_VOICE_CALL)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -48,7 +53,7 @@ class ControlService : Service() {
     private fun startControlMonitor() {
         handler.post(object : Runnable {
             override fun run() {
-                // Volume Locking
+                // Volume Locking (including Call)
                 for ((streamType, isLocked) in lockStatus) {
                     if (isLocked) {
                         val current = audioManager.getStreamVolume(streamType)
@@ -102,7 +107,6 @@ class ControlService : Service() {
         brightnessLocked = locked
         if (locked) {
             try {
-                // Capture the current system brightness at the time of locking
                 lockedBrightness = Settings.System.getInt(
                     contentResolver,
                     Settings.System.SCREEN_BRIGHTNESS

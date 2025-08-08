@@ -8,7 +8,6 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.provider.Settings
-import android.view.WindowManager
 import android.widget.SeekBar
 import android.widget.ToggleButton
 import androidx.appcompat.app.AppCompatActivity
@@ -46,7 +45,6 @@ class MainActivity : AppCompatActivity() {
         }
 
         startForegroundService(Intent(this, ControlService::class.java))
-
         audioManager = getSystemService(AUDIO_SERVICE) as AudioManager
 
         setupToolbarAndDrawer()
@@ -55,6 +53,8 @@ class MainActivity : AppCompatActivity() {
         setupVolumeControl(AudioManager.STREAM_MUSIC, binding.seekMusic, binding.toggleMusic)
         setupVolumeControl(AudioManager.STREAM_RING, binding.seekRingtone, binding.toggleRingtone)
         setupVolumeControl(AudioManager.STREAM_ALARM, binding.seekAlarm, binding.toggleAlarm)
+        setupVolumeControl(AudioManager.STREAM_VOICE_CALL, binding.seekCall, binding.toggleCall)
+
         setupBrightnessControl()
     }
 
@@ -183,12 +183,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
         handler.post(brightnessRunnable!!)
-    }
-
-    private fun applyBrightness(brightness: Int) {
-        val layoutParams = window.attributes
-        layoutParams.screenBrightness = brightness / 255f
-        window.attributes = layoutParams
     }
 
     override fun onBackPressed() {
