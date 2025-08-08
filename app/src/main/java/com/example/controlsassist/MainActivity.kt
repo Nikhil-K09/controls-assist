@@ -67,6 +67,13 @@ class MainActivity : AppCompatActivity() {
     private fun setupDrawerMenu() {
         binding.navigationView.setNavigationItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
+                R.id.nav_permissions -> {
+                    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                        data = Uri.fromParts("package", packageName, null)
+                    }
+                    startActivity(intent)
+                    true
+                }
                 R.id.nav_toggle_dark_mode -> {
                     toggleTheme()
                     true
@@ -75,6 +82,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
 
     private fun toggleTheme() {
         val isDarkMode = sharedPref.getBoolean("dark_mode", false)
