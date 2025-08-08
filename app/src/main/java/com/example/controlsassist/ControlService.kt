@@ -10,6 +10,7 @@ import android.os.*
 import android.provider.Settings
 import androidx.core.app.NotificationCompat
 import android.content.SharedPreferences
+import android.util.Log
 
 class ControlService : Service() {
 
@@ -17,14 +18,15 @@ class ControlService : Service() {
     private lateinit var handler: Handler
     private lateinit var prefs: SharedPreferences
 
-    private val lockStatus = mutableMapOf<Int, Boolean>() // Stream type to lock status
-    private val targetVolumes = mutableMapOf<Int, Int>()  // Stream type to desired volume
+    private val lockStatus = mutableMapOf<Int, Boolean>()
+    private val targetVolumes = mutableMapOf<Int, Int>()
 
     private var brightnessLocked = false
-    private var lockedBrightness = -1 // -1 means not set
+    private var lockedBrightness = -1
 
     override fun onCreate() {
         super.onCreate()
+        Log.d("ControlService", "Service started")
         audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
         handler = Handler(Looper.getMainLooper())
         prefs = getSharedPreferences("ControlPrefs", MODE_PRIVATE)
@@ -33,7 +35,6 @@ class ControlService : Service() {
         startForeground(1, buildNotification())
         startControlMonitor()
 
-        // Initialize Call stream lock status so it's recognized by monitor loop
         lockStatus[AudioManager.STREAM_VOICE_CALL] = false
         targetVolumes[AudioManager.STREAM_VOICE_CALL] =
             audioManager.getStreamVolume(AudioManager.STREAM_VOICE_CALL)
@@ -53,7 +54,7 @@ class ControlService : Service() {
     private fun startControlMonitor() {
         handler.post(object : Runnable {
             override fun run() {
-                // Volume Locking (including Call)
+                // Volume Locking
                 for ((streamType, isLocked) in lockStatus) {
                     if (isLocked) {
                         val current = audioManager.getStreamVolume(streamType)
